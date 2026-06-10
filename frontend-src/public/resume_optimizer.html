@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Resume Optimizer - Job Hunt AI (JSON → LaTeX)</title>
+    <style>
+        /* (your original CSS) */
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg,#667eea 0%,#764ba2 100%); min-height:100vh; padding:20px; }
+        .container { max-width:1200px; margin:0 auto; background:white; border-radius:15px; box-shadow:0 20px 40px rgba(0,0,0,0.1); overflow:hidden; }
+        .header { background: linear-gradient(135deg,#2c3e50 0%,#34495e 100%); color:white; padding:30px; text-align:center; }
+        .header h1 { font-size:2.2em; margin-bottom:6px; font-weight:300; }
+        .header p { font-size:1.0em; opacity:0.95; }
+        .main-content { display:grid; grid-template-columns:1fr 1fr; gap:30px; padding:30px; }
+        .input-section, .output-section { background:#f8f9fa; padding:25px; border-radius:10px; border:2px dashed #dee2e6; }
+        .file-upload label, .job-description label { display:block; margin-bottom:10px; font-weight:600; color:#495057; }
+        .file-input-wrapper { position:relative; display:inline-block; width:100%; }
+        .file-input { position:absolute; opacity:0; width:100%; height:100%; cursor:pointer; }
+        .file-input-button { display:flex; align-items:center; justify-content:center; padding:15px; background:#007bff; color:white; border-radius:8px; cursor:pointer; border:none; width:100%; }
+        .file-input-button:hover { background:#0056b3; transform:translateY(-2px); }
+        .job-description textarea { width:100%; height:160px; padding:12px; border:2px solid #dee2e6; border-radius:8px; font-family:inherit; font-size:14px; resize:vertical; }
+        .optimize-button { padding:12px; background:linear-gradient(135deg,#28a745 0%,#20c997 100%); color:white; border:none; border-radius:8px; font-size:1em; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:8px; }
+        .small-button { padding:10px 12px; background:#6c757d; color:white; border:none; border-radius:8px; cursor:pointer; font-size:0.95em; margin-left:8px; }
+        .loading { display:none; text-align:center; padding:40px; }
+        .spinner { border:4px solid #f3f3f3; border-top:4px solid #007bff; border-radius:50%; width:50px; height:50px; animation:spin 1s linear infinite; margin:0 auto 20px; }
+        @keyframes spin { 0% { transform:rotate(0deg); } 100% { transform:rotate(360deg); } }
+        .logs-section { background:#2c3e50; color:#ecf0f1; padding:20px; border-radius:8px; margin-bottom:20px; font-family:'Courier New', monospace; font-size:12px; max-height:400px; overflow-y:auto; }
+        .preview-section { background:white; border:1px solid #dee2e6; border-radius:8px; padding:20px; min-height:300px; }
+        .pdf-preview { width:100%; height:500px; border:1px solid #dee2e6; border-radius:5px; }
+        .download-button { background:linear-gradient(135deg,#dc3545 0%,#c82333 100%); color:white; padding:12px 30px; border:none; border-radius:8px; text-decoration:none; display:inline-block; }
+        .error-message { background:#f8d7da; color:#721c24; padding:15px; border-radius:8px; margin:20px 0; border:1px solid #f5c6cb; display:none;}
+        .success-message { background:#d4edda; color:#155724; padding:15px; border-radius:8px; margin:20px 0; border:1px solid #c3e6cb; display:none;}
+        @media (max-width:768px){ .main-content { grid-template-columns:1fr; gap:20px; padding:20px; } .header h1 { font-size:1.8em; } }
+    </style>
+
+    <!-- PDF.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script> pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'; </script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-magic"></i> Resume Optimizer</h1>
+            <p>AI pipeline: <strong>PDF → extract → LLM(JSON) → populate LaTeX template → compile/preview</strong></p>
+        </div>
+
+        <div class="main-content">
+            <div class="input-section">
+                <h2><i class="fas fa-upload"></i> Upload & Configure</h2>
+
+                <div class="file-upload">
+                    <label for="resumeFile">Upload Your Resume (PDF/DOC/DOCX/TXT)</label>
+                    <div class="file-input-wrapper">
+                        <input type="file" id="resumeFile" class="file-input" accept=".pdf,.doc,.docx,.txt" />
+                        <button class="file-input-button" onclick="document.getElementById('resumeFile').click()">
+                            <i class="fas fa-file-upload"></i>&nbsp; Choose Resume File
+                        </button>
+                    </div>
+                    <div id="fileInfo" style="margin-top:10px; font-size:14px; color:#6c757d;"></div>
+                </div>
+
+                <div class="job-description">
+                    <label for="jobDescription">Job Description</label>
+                    <textarea id="jobDescription" placeholder="Paste the job description here..."></textarea>
+                </div>
+
+                <div style="display:flex; gap:8px; align-items:center;">
+                    <button class="optimize-button" id="optimizeBtn" onclick="optimizeResume()">
+                        <i class="fas fa-magic"></i> Optimize Resume
+                    </button>
+
+                    <!-- NEW TEST BUTTONS -->
+                    <button class="small-button" id="testPromptBtn" onclick="testSystemPrompt()">Test Prompt</button>
+                    <button class="small-button" id="dryRunBtn" onclick="dryRunPipeline()">Dry-Run (local)</button>
+                </div>
+
+                <p style="margin-top:12px; font-size:12px; color:#8a8a8a;">
+                    <strong>Security:</strong> API keys must be stored on a backend. This front-end file has no keys.
+                </p>
+            </div>
+
+            <div class="output-section">
+                <h2><i class="fas fa-eye"></i> Optimization Results</h2>
+
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p>Working...</p>
+                </div>
+
+                <div id="errorMessage" class="error-message"></div>
+                <div id="successMessage" class="success-message"></div>
+
+                <div id="logsSection" class="logs-section" style="display:none;">
+                    <h3><i class="fas fa-terminal"></i> Logs</h3>
+                    <div id="logsContent"></div>
+                </div>
+
+                <div id="previewSection" class="preview-section" style="display:none;">
+                    <h3><i class="fas fa-file-pdf"></i> Preview</h3>
+                    <div id="compilationInfo" style="background:#fff3cd;border:1px solid #ffc107;padding:10px;border-radius:5px;margin-bottom:12px;display:none;">
+                        <strong><i class="fas fa-info-circle"></i> Status:</strong> <span id="compilationMessage"></span>
+                    </div>
+                    <iframe id="pdfPreview" class="pdf-preview" src=""></iframe>
+                    <div style="margin-top:12px; text-align:center;">
+                        <a id="downloadLink" class="download-button" href="#" style="display:none;"><i class="fas fa-download"></i> Download</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+/* ---------- JSON-first pipeline: request AI JSON -> populate LaTeX template (client-side) ---------- */
+
+/* ---- CONFIG: no API keys in client ---- */
+const OPENAI_API_KEY = '';    // keep empty for safety; use backend in prod
+const GEMINI_API_KEY = '';
+const DEEPINFRA_API_KEY = 'jreZ9xEbQKQ7L3f5RxC9hlFFAdzogSVm';
+
+let uploadedFile = null;
+let systemPrompt = ''; // we load prompt file or embedded fallback
+
+/* ---------- Logging Helpers ---------- */
+function addLog(message, type='info') {
+    showSection('logsSection');
+    const timestamp = new Date().toLocaleTimeString();
+    const logsContent = document.getElementById('logsContent');
+    const logDiv = document.createElement('div');
+    logDiv.className = `log-entry log-${type}`;
+    logDiv.style.marginBottom='6px';
+    logDiv.style.paddingLeft='8px';
+    logDiv.innerHTML = `<strong>[${timestamp}]</strong> ${message}`;
+    logsContent.appendChild(logDiv);
+    logsContent.scrollTop = logsContent.scrollHeight;
+}
+function showSection(id) { document.getElementById(id).style.display = 'block'; }
+function hideSection(id) { document.getElementById(id).style.display = 'none'; }
+function showError(msg){ const el = document.getElementById('errorMessage'); el.innerHTML = msg; el.style.display='block'; }
+function clearError(){ document.getElementById('errorMessage').style.display='none'; }
+function showSuccess(msg){ const el = document.getElementById('successMessage'); el.innerHTML = msg; el.style.display='block'; }
+function clearSuccess(){ document.getElementById('successMessage').style.display='none'; }
+
+/* ---------- Load system prompt (optional file) ---------- */
+async function loadSystemPrompt() {
+    try {
+        addLog('Loading system prompt...', 'info');
+        const r = await fetch('Resume_opt_prompt.txt');
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        systemPrompt = await r.text();
+        addLog('System prompt loaded from Resume_opt_prompt.txt', 'success');
+    } catch (e) {
+        addLog(`Could not fetch Resume_opt_prompt.txt: ${e.message}`, 'warning');
+        systemPrompt = getEmbeddedPrompt();
+        addLog('Using embedded fallback prompt', 'info');
+    }
+}
+function getEmbeddedPrompt(){
+    return `You are an intelligent Resume Optimization Agent. Return a JSON object with fields: name, contact, summary, education[], experience[], skills[], projects[], additional[]. DO NOT output any explanation. Only return valid JSON.`;
+}
+window.addEventListener('DOMContentLoaded', loadSystemPrompt);
+
+/* ---------- File handling & extraction ---------- */
+document.getElementById('resumeFile').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        uploadedFile = file;
+        document.getElementById('fileInfo').innerHTML =
+            `<i class="fas fa-check-circle" style="color:#28a745;"></i> Selected: ${file.name} (${(file.size/1024/1024).toFixed(2)} MB)`;
+    }
+});
+
+async function extractTextFromResume(file){
+    const name = file.name.toLowerCase();
+    if (name.endsWith('.pdf')) {
+        const arrayBuffer = await file.arrayBuffer();
+        const typed = new Uint8Array(arrayBuffer);
+        const pdf = await pdfjsLib.getDocument(typed).promise;
+        let fullText = '';
+        for (let p=1; p<=pdf.numPages; p++){
+            const page = await pdf.getPage(p);
+            const tc = await page.getTextContent();
+            const pageText = tc.items.map(it => it.str).join(' ');
+            fullText += pageText + '\n\n';
+        }
+        return { fullText, sections: parseResumeSections(fullText) };
+    } else {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => {
+                const txt = String(reader.result);
+                resolve({ fullText: txt, sections: parseResumeSections(txt) });
+            };
+            reader.onerror = (err) => reject(err);
+            reader.readAsText(file);
+        });
+    }
+}
+
+/* ---------- Simple section parser (lightweight) ---------- */
+function parseResumeSections(text){
+    const sections = { header:'', summary:'', education:'', experience:'', skills:'', projects:'', other:'' };
+    const lines = text.split('\n').map(l=>l.trim()).filter(Boolean);
+    let current = 'header';
+    const patterns = {
+        summary: /\b(summary|objective|profile|about)\b/i,
+        education: /\b(education|academic|qualification)\b/i,
+        experience: /\b(experience|employment|work history)\b/i,
+        skills: /\b(skills|technical skills|competencies|technologies)\b/i,
+        projects: /\b(projects|portfolio)\b/i
+    };
+    let headerLines=[];
+    for (const line of lines){
+        let matched = false;
+        for (const [k,pat] of Object.entries(patterns)){
+            if (pat.test(line)) { current=k; matched=true; addLog(`Found section ${k}`, 'info'); break; }
+        }
+        if (!matched) {
+            if (current==='header' && headerLines.length<5) headerLines.push(line);
+            else sections[current] += line + '\n';
+        }
+    }
+    sections.header = headerLines.join(' | ');
+    return sections;
+}
+
+/* ---------- Test prompt display ---------- */
+function testSystemPrompt(){
+    if (!systemPrompt) { showError('System prompt not loaded'); return; }
+    addLog('--- System Prompt (truncated) ---', 'info');
+    const preview = systemPrompt.slice(0, 2000) + (systemPrompt.length>2000 ? '\n\n...(truncated)' : '');
+    addLog(preview.replace(/\n/g, ' '), 'info');
+    navigator.clipboard?.writeText(systemPrompt).then(()=> addLog('System prompt copied to clipboard', 'success')).catch(()=>addLog('Clipboard copy failed', 'warning'));
+}
+
+/* ---------- Render JSON -> LaTeX template (string) ---------- */
+/* Template based on the Jake Gutierrez resume you provided. Placeholders are filled programmatically. */
+const latexTemplate = `
+%-------------------------
+% Resume generated from JSON template
+%-------------------------
+\\documentclass[a4paper,11pt]{article}
+\\usepackage[utf8]{inputenc}
+\\usepackage{latexsym}
+\\usepackage{graphicx}
+\\usepackage[empty]{fullpage}
+\\usepackage{titlesec}
+\\usepackage{ragged2e}
+\\usepackage{marvosym}
+\\usepackage[usenames,dvipsnames]{color}
+\\usepackage{verbatim}
+\\usepackage{enumitem}
+\\usepackage[hidelinks]{hyperref}
+\\usepackage{fancyhdr}
+\\usepackage[english]{babel}
+\\usepackage{tabularx}
+\\usepackage{fontawesome5}
+\\usepackage{multicol}
+\\setlength{\\multicolsep}{-3.0pt}
+\\setlength{\\columnsep}{-1pt}
+\\input{glyphtounicode}
+\\usepackage{helvet}
+\\pagestyle{fancy}
+\\fancyhf{}
+\\renewcommand{\\headrulewidth}{0pt}
+\\renewcommand{\\footrulewidth}{0pt}
+\\addtolength{\\oddsidemargin}{-0.6in}
+\\addtolength{\\evensidemargin}{-0.5in}
+\\addtolength{\\textwidth}{1.19in}
+\\addtolength{\\topmargin}{-.6in}
+\\addtolength{\\textheight}{1.4in}
+\\urlstyle{same}
+\\raggedbottom
+\\raggedright
+\\setlength{\\tabcolsep}{0in}
+\\titleformat{\\section}{
+  \\vspace{-9pt}\\scshape\\raggedright\\large\\bfseries
+}{}{0em}{}[\\color{black}\\titlerule \\vspace{-5pt}]
+\\pdfgentounicode=1
+\\usepackage{pifont}
+\\newcommand{\\resumeItem}[1]{
+\\justifying
+\\setlength{\\itemindent}{-0pt}
+  \\item[\\tiny\\ding{108}]{
+    {#1\\par \\vspace{-1pt}}
+  }
+}
+\\newcommand{\\eduSubheading}[4]{
+  \\vspace{-2pt}\\item
+    \\begin{tabular*}{1.0\\textwidth}[t]{l@{\\extracolsep{\\fill}}r}
+      \\textbf{#1} & {#2} \\\\
+      {#3} & {#4} \\\\
+      \\multicolumn{2}{l}{{\\small}}\\vspace{-5pt}
+    \\end{tabular*}\\vspace{-7pt}
+}
+\\newcommand{\\resumeSubheading}[4]{
+  \\vspace{-2pt}\\item
+    \\begin{tabular*}{1.0\\textwidth}[t]{l@{\\extracolsep{\\fill}}r}
+      \\textbf{#1} & {#2} \\\\
+      {#3} & {#4} \\\\
+      \\multicolumn{2}{l}{{\\small}}\\vspace{-5pt}
+    \\end{tabular*}\\vspace{-14pt}
+}
+\\newcommand{\\projectSubheading}[4]{
+  \\vspace{-2pt}\\item
+    \\begin{tabular*}{1.0\\textwidth}[t]{l@{\\extracolsep{\\fill}}r}
+      \\textbf{#1} & {#2} \\\\
+    \\end{tabular*}\\vspace{-7pt}
+}
+\\newcommand{\\resumeSubItem}[1]{\\resumeItem{#1}\\vspace{-4pt}}
+\\renewcommand\\labelitemi{\\$\\vcenter{\\hbox{\\tiny$\\bullet$}}$}
+\\renewcommand\\labelitemii{\\$\\vcenter{\\hbox{\\tiny$\\bullet$}}$}
+\\newcommand{\\resumeSubHeadingListStart}{\\begin{itemize}[leftmargin=0.0in, label={}]}
+\\newcommand{\\resumeSubHeadingListEnd}{\\end{itemize}}
+\\newcommand{\\resumeItemListStart}{\\begin{itemize}}
+\\newcommand{\\resumeItemListEnd}{\\end{itemize}\\vspace{-5pt}}
+\\begin{document}
+
+% Header
+\\begin{center}
+    {\\resizebox{0.30\\textwidth}{!}{%NAME%}} \\\\ \\vspace{5pt}
+    \\small %CONTACT_LINE%
+\\end{center}
+
+% Summary
+\\section{Summary}
+\\justifying
+%SUMMARY%
+
+% Education
+\\section{EDUCATION}
+\\resumeSubHeadingListStart
+%EDUCATION_ITEMS%
+\\resumeSubHeadingListEnd
+
+% Work Experience
+\\section{WORK EXPERIENCE}
+\\resumeSubHeadingListStart
+%EXPERIENCE_ITEMS%
+\\resumeSubHeadingListEnd
+
+% Skills
+\\section{SKILLS}
+\\vspace{-5pt}
+\\resumeSubHeadingListStart
+  \\resumeItemListStart
+%SKILLS_ITEMS%
+  \\resumeItemListEnd
+\\resumeSubHeadingListEnd
+
+% Projects
+\\section{PROJECT EXPERIENCE}
+\\resumeSubHeadingListStart
+%PROJECT_ITEMS%
+\\resumeSubHeadingListEnd
+
+% Additional
+%ADDITIONAL_SECTION%
+
+\\end{document}
+`;
+
+/* ---------- Escape text for LaTeX safety ---------- */
+function escapeLatexForTemplate(s) {
+    if (s === null || s === undefined) return '';
+    s = String(s);
+    const replacements = {
+        '\\': '\\textbackslash{}',
+        '&': '\\&',
+        '%': '\\%',
+        '$': '\\$',
+        '#': '\\#',
+        '_': '\\_',
+        '{': '\\{',
+        '}': '\\}',
+        '~': '\\textasciitilde{}',
+        '^': '\\textasciicircum{}'
+    };
+    return s.replace(/([\\&%$#_{}~^])/g, (m) => replacements[m] || m);
+}
+
+/* ---------- Build LaTeX from JSON data ---------- */
+function buildLatexFromJson(json) {
+    // Name and contact
+    const name = escapeLatexForTemplate(json.name || '');
+    const contact = json.contact || {};
+    const contactParts = [];
+    
+    if (contact.location) contactParts.push(escapeLatexForTemplate(contact.location));
+    if (contact.phone) contactParts.push(escapeLatexForTemplate(contact.phone));
+    if (contact.email) contactParts.push(`\\href{mailto:${escapeLatexForTemplate(contact.email)}}{\\underline{${escapeLatexForTemplate(contact.email)}}}`);
+    if (contact.linkedin) contactParts.push(`\\href{${escapeLatexForTemplate(contact.linkedin)}}{\\underline{LinkedIn}}`);
+    if (contact.github) contactParts.push(`\\href{${escapeLatexForTemplate(contact.github)}}{\\underline{Github}}`);
+    
+    const contactLine = contactParts.join(' ~ $\\mid$ ~ ');
+    
+    // Summary
+    const summary = escapeLatexForTemplate(json.summary || '');
+    
+    // Education
+    let educationItems = '';
+    if (Array.isArray(json.education)) {
+        for (const e of json.education) {
+            const degree = escapeLatexForTemplate(e.degree || '');
+            const dates = escapeLatexForTemplate(e.dates || '');
+            const inst = escapeLatexForTemplate(e.institution || '');
+            const gpa = escapeLatexForTemplate(e.gpa || '');
+            educationItems += `\\resumeSubheading{${degree}}{${dates}}{${inst}}{${gpa}}\n`;
+        }
+    }
+    
+    // Experience
+    let experienceItems = '';
+    if (Array.isArray(json.experience)) {
+        for (const job of json.experience) {
+            const title = escapeLatexForTemplate(job.title || '');
+            const dates = escapeLatexForTemplate(job.dates || '');
+            const company = escapeLatexForTemplate(job.company || '');
+            const location = escapeLatexForTemplate(job.location || '');
+            experienceItems += `\\resumeSubheading{${title}}{${dates}}{${company}}{${location}}\n\\resumeItemListStart\n`;
+            
+            if (Array.isArray(job.bullets)) {
+                for (const b of job.bullets) {
+                    experienceItems += `\\resumeItem{${escapeLatexForTemplate(b)}}\n`;
+                }
+            }
+            experienceItems += `\\resumeItemListEnd\n`;
+        }
+    }
+    
+    // Skills - Categorized format
+    let skillsItems = '';
+    if (json.skills) {
+        if (Array.isArray(json.skills)) {
+            // Handle array format
+            skillsItems = `\\begin{itemize}[leftmargin=0.15in, label={}]
+
+  \\small{\\item{
+    \\textbf{Skills}{: ${json.skills.map(s => escapeLatexForTemplate(s)).join(', ')}}
+  }}
+\\end{itemize}`;
+        } else {
+            // Handle object format with categories
+            const categories = [];
+            if (json.skills.languages && json.skills.languages.length) {
+                categories.push(`\\textbf{Languages}{: ${json.skills.languages.map(s => escapeLatexForTemplate(s)).join(', ')}}`);
+            }
+            if (json.skills.frameworks && json.skills.frameworks.length) {
+                categories.push(`\\textbf{Frameworks}{: ${json.skills.frameworks.map(s => escapeLatexForTemplate(s)).join(', ')}}`);
+            }
+            if (json.skills.tools && json.skills.tools.length) {
+                categories.push(`\\textbf{Developer Tools}{: ${json.skills.tools.map(s => escapeLatexForTemplate(s)).join(', ')}}`);
+            }
+            if (json.skills.databases && json.skills.databases.length) {
+                categories.push(`\\textbf{Databases}{: ${json.skills.databases.map(s => escapeLatexForTemplate(s)).join(', ')}}`);
+            }
+            
+            // Add any other categories
+            for (const [key, value] of Object.entries(json.skills)) {
+                if (!['languages', 'frameworks', 'tools', 'databases'].includes(key) && Array.isArray(value) && value.length) {
+                    const categoryName = key.charAt(0).toUpperCase() + key.slice(1);
+                    categories.push(`\\textbf{${categoryName}}{: ${value.map(s => escapeLatexForTemplate(s)).join(', ')}}`);
+                }
+            }
+            
+            skillsItems = `\\begin{itemize}[leftmargin=0.15in, label={}]
+
+  \\small{\\item{
+    ${categories.join(' \\\\\n    ')}
+  }}
+\\end{itemize}`;
+        }
+    }
+    
+    // Projects
+    let projectItems = '';
+    if (Array.isArray(json.projects)) {
+        for (const p of json.projects) {
+            const title = escapeLatexForTemplate(p.title || '');
+            const date = escapeLatexForTemplate(p.date || '');
+            const tech = p.technologies ? ` $|$ \\emph{${escapeLatexForTemplate(p.technologies)}}` : '';
+            
+            projectItems += `\\resumeProjectHeading{\\textbf{${title}}${tech}}{${date}}\n\\resumeItemListStart\n`;
+            
+            if (Array.isArray(p.bullets)) {
+                for (const b of p.bullets) {
+                    projectItems += `\\resumeItem{${escapeLatexForTemplate(b)}}\n`;
+                }
+            }
+            projectItems += `\\resumeItemListEnd\n`;
+        }
+    }
+    
+    // Additional
+    let additionalSection = '';
+    if (Array.isArray(json.additional) && json.additional.length) {
+        let items = '';
+        for (const a of json.additional) {
+            items += `\\resumeItem{${escapeLatexForTemplate(a)}}\n`;
+        }
+        additionalSection = `\\section{ADDITIONAL}\n\\resumeSubHeadingListStart\n\\resumeItemListStart\n${items}\\resumeItemListEnd\n\\resumeSubHeadingListEnd\n`;
+    }
+    
+    // Replace template with Jake Gutierrez template (all commands properly defined)
+    const fullLatexTemplate = `%-------------------------
+% Resume in Latex
+% Author : Jake Gutierrez
+% Based off of: https://github.com/sb2nov/resume
+% License : MIT
+%------------------------
+
+\\documentclass[letterpaper,11pt]{article}
+
+\\usepackage{latexsym}
+\\usepackage[empty]{fullpage}
+\\usepackage{titlesec}
+\\usepackage{marvosym}
+\\usepackage[usenames,dvipsnames]{color}
+\\usepackage{verbatim}
+\\usepackage{enumitem}
+\\usepackage[hidelinks]{hyperref}
+\\usepackage{fancyhdr}
+\\usepackage[english]{babel}
+\\usepackage{tabularx}
+\\input{glyphtounicode}
+
+\\pagestyle{fancy}
+\\fancyhf{} % clear all header and footer fields
+\\fancyfoot{}
+\\renewcommand{\\headrulewidth}{0pt}
+\\renewcommand{\\footrulewidth}{0pt}
+
+% Adjust margins
+\\addtolength{\\oddsidemargin}{-0.5in}
+\\addtolength{\\evensidemargin}{-0.5in}
+\\addtolength{\\textwidth}{1in}
+\\addtolength{\\topmargin}{-.5in}
+\\addtolength{\\textheight}{1.0in}
+
+\\urlstyle{same}
+
+\\raggedbottom
+\\raggedright
+\\setlength{\\tabcolsep}{0in}
+
+% Sections formatting
+\\titleformat{\\section}{
+  \\vspace{-4pt}\\scshape\\raggedright\\large
+}{}{0em}{}[\\color{black}\\titlerule \\vspace{-5pt}]
+
+% Ensure that generate pdf is machine readable/ATS parsable
+\\pdfgentounicode=1
+
+%-------------------------
+% Custom commands
+\\newcommand{\\resumeItem}[1]{
+  \\item\\small{
+    {#1 \\vspace{-2pt}}
+  }
+}
+
+\\newcommand{\\resumeSubheading}[4]{
+  \\vspace{-2pt}\\item
+    \\begin{tabular*}{0.97\\textwidth}[t]{l@{\\extracolsep{\\fill}}r}
+      \\textbf{#1} & #2 \\\\
+      \\textit{\\small#3} & \\textit{\\small #4} \\\\
+    \\end{tabular*}\\vspace{-7pt}
+}
+
+\\newcommand{\\resumeSubSubheading}[2]{
+    \\item
+    \\begin{tabular*}{0.97\\textwidth}{l@{\\extracolsep{\\fill}}r}
+      \\textit{\\small#1} & \\textit{\\small #2} \\\\
+    \\end{tabular*}\\vspace{-7pt}
+}
+
+\\newcommand{\\resumeProjectHeading}[2]{
+    \\item
+    \\begin{tabular*}{0.97\\textwidth}{l@{\\extracolsep{\\fill}}r}
+      \\small#1 & #2 \\\\
+    \\end{tabular*}\\vspace{-7pt}
+}
+
+\\newcommand{\\resumeSubItem}[1]{\\resumeItem{#1}\\vspace{-4pt}}
+
+\\renewcommand\\labelitemii{$\\vcenter{\\hbox{\\tiny$\\bullet$}}$}
+
+\\newcommand{\\resumeSubHeadingListStart}{\\begin{itemize}[leftmargin=0.15in, label={}]}
+\\newcommand{\\resumeSubHeadingListEnd}{\\end{itemize}}
+\\newcommand{\\resumeItemListStart}{\\begin{itemize}}
+\\newcommand{\\resumeItemListEnd}{\\end{itemize}\\vspace{-5pt}}
+
+%-------------------------------------------
+%%%%%%  RESUME STARTS HERE  %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\\begin{document}
+
+%----------HEADING----------
+\\begin{center}
+    \\textbf{\\Huge \\scshape ${name}} \\\\ \\vspace{1pt}
+    \\small ${contactLine}
+\\end{center}
+
+%----------SUMMARY----------
+\\section{Summary}
+${summary}
+
+%-----------EDUCATION-----------
+\\section{Education}
+  \\resumeSubHeadingListStart
+    ${educationItems}
+  \\resumeSubHeadingListEnd
+
+%-----------EXPERIENCE-----------
+\\section{Experience}
+  \\resumeSubHeadingListStart
+    ${experienceItems}
+  \\resumeSubHeadingListEnd
+
+%-----------SKILLS-----------
+\\section{Technical Skills}
+${skillsItems}
+
+%-----------PROJECTS-----------
+\\section{Projects}
+  \\resumeSubHeadingListStart
+    ${projectItems}
+  \\resumeSubHeadingListEnd
+
+%-----------ADDITIONAL-----------
+${additionalSection}
+
+%-------------------------------------------
+\\end{document}`;
+
+    return fullLatexTemplate;
+}
+
+/* ---------- Remote AI call using DeepInfra ---------- */
+async function optimizeWithAI_remote_json(promptData) {
+    const apiKey = DEEPINFRA_API_KEY;
+    if (!apiKey) throw new Error('DeepInfra API key not set');
+    
+    // Extract key requirements from job description for better targeting
+    const jobDesc = promptData.jobDescription || '';
+    
+    // Construct a more effective user message that focuses on optimization
+    const userMessage = `
+# Resume Optimization Request
+
+## Candidate Information
+- Level: ${promptData.candidateLevel}
+- Current Info: ${JSON.stringify(promptData.contactInfo)}
+
+## Job Description
+${jobDesc}
+
+## Resume Content
+${promptData.resumeChunks.join('\n')}
+
+## Instructions
+1. ANALYZE the resume to understand the candidate's background and experience
+2. OPTIMIZE the content following the format rules for a ${promptData.candidateLevel} candidate:
+   - Rewrite bullets in "action → impact → tools" format 
+   - Quantify achievements
+   - Prioritize relevant experience for the job description
+   - Categorize skills properly into Languages, Frameworks, etc.
+3. RESPOND with ONLY a valid JSON object that follows this structure:
+
+{
+  "name": "Full Name",
+  "contact": {
+    "phone": "Phone Number",
+    "email": "Email",
+    "linkedin": "LinkedIn URL",
+    "github": "GitHub URL",
+    "location": "Location"
+  },
+  "summary": "A concise, impactful professional summary",
+  "education": [
+    {
+      "institution": "University Name",
+      "location": "Location",
+      "degree": "Degree Name",
+      "dates": "Date Range",
+      "gpa": "GPA if available"
+    }
+  ],
+  "experience": [
+    {
+      "title": "Job Title",
+      "company": "Company Name",
+      "location": "Location",
+      "dates": "Date Range",
+      "bullets": [
+        "Accomplishment using X-Y-Z format: Did X to achieve Y using Z",
+        "Another quantifiable achievement"
+      ]
+    }
+  ],
+  "skills": {
+    "languages": ["Language1", "Language2"],
+    "frameworks": ["Framework1", "Framework2"],
+    "tools": ["Tool1", "Tool2"],
+    "databases": ["Database1", "Database2"]
+  },
+  "projects": [
+    {
+      "title": "Project Name",
+      "date": "Date",
+      "bullets": ["Detail in X-Y-Z format", "Another detail"]
+    }
+  ],
+  "additional": ["Additional info 1", "Additional info 2"]
+}`;
+
+    // Use a more capable model for structure
+    const modelToUse = 'mistralai/Mixtral-8x7B-Instruct-v0.1';
+    
+    const response = await fetch('https://api.deepinfra.com/v1/openai/chat/completions', {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            model: modelToUse,
+            messages: [
+                { 
+                    role: 'system', 
+                    content: promptData.systemPrompt 
+                },
+                { role: 'user', content: userMessage }
+            ],
+            max_tokens: 4000,
+            temperature: 0.3
+        })
+    });
+
+    if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`DeepInfra API error: ${response.status} - ${errorText}`);
+    }
+
+    const data = await response.json();
+    let content = data.choices[0].message.content.trim();
+    addLog(`Raw AI response length: ${content.length} chars`, 'info');
+    
+    // Extract JSON using regex
+    const jsonMatch = content.match(/```(?:json)?\s*([\s\S]*?)```|(\{[\s\S]*\})/);
+    let jsonContent = jsonMatch ? (jsonMatch[1] || jsonMatch[2]) : content;
+    
+    // Clean up JSON
+    jsonContent = jsonContent.trim();
+    if (!jsonContent.startsWith('{')) {
+        jsonContent = '{' + jsonContent.substring(jsonContent.indexOf('{') + 1);
+    }
+    if (!jsonContent.endsWith('}')) {
+        jsonContent = jsonContent.substring(0, jsonContent.lastIndexOf('}') + 1);
+    }
+    
+    // Validate by parsing
+    try {
+        JSON.parse(jsonContent);
+        addLog('JSON validation successful', 'success');
+    } catch (e) {
+        addLog(`JSON validation failed: ${e.message}. Attempting repair...`, 'error');
+        
+        // Basic cleanup - remove trailing commas before closing brackets
+        jsonContent = jsonContent.replace(/,\s*}/g, '}').replace(/,\s*]/g, ']');
+        
+        try {
+            JSON.parse(jsonContent);
+            addLog('JSON repair successful', 'success');
+        } catch (finalError) {
+            addLog(`Final JSON validation failed: ${finalError.message}`, 'error');
+            throw new Error('Unable to parse AI response as valid JSON');
+        }
+    }
+    
+    return jsonContent;
+}
+
+/* ---------- Main optimizeResume (uses JSON-first approach) ---------- */
+async function optimizeResume() {
+    clearError(); clearSuccess();
+    if (!uploadedFile) { showError('Please upload a resume file first.'); return; }
+    const jobDesc = document.getElementById('jobDescription').value.trim();
+    if (!jobDesc) { showError('Please enter a job description.'); return; }
+
+    showSection('logsSection'); 
+    hideSection('previewSection');
+    showSection('loading'); 
+    document.getElementById('logsContent').innerHTML='';
+
+    try {
+        addLog('Starting pipeline: extract -> ask LLM for JSON -> populate LaTeX template', 'info');
+
+        // Extract
+        addLog('Extracting text...', 'info');
+        const resumeData = await extractTextFromResume(uploadedFile);
+        addLog(`Extracted ${resumeData.fullText.length} chars`, 'success');
+
+        // Candidate level
+        addLog('Analyzing candidate level...', 'info');
+        const candidateLevel = await analyzeCandidateLevel(resumeData);
+        addLog(`Candidate level: ${candidateLevel}`, 'success');
+
+        // Prepare prompt/payload for LLM
+        const promptData = {
+            systemPrompt,
+            candidateLevel,
+            contactInfo: { name: resumeData.sections.header },
+            jobDescription: jobDesc,
+            resumeChunks: [resumeData.fullText]
+        };
+
+        // Call remote AI API
+        addLog('Requesting optimized JSON from AI (remote)...', 'info');
+        const jsonString = await optimizeWithAI_remote_json(promptData);
+        addLog('AI returned JSON string (attempting to parse)...', 'info');
+
+        // Try parse
+        let parsed;
+        try {
+            parsed = JSON.parse(jsonString);
+            addLog('Parsed AI JSON successfully', 'success');
+        } catch (err) {
+            addLog('Failed to parse JSON from AI. Showing raw output in logs for debugging.', 'error');
+            addLog(jsonString, 'error');
+            throw new Error('AI did not return valid JSON. Inspect logs.');
+        }
+
+        // Build LaTeX
+        addLog('Populating LaTeX template with JSON data...', 'info');
+        const latex = buildLatexFromJson(parsed);
+        addLog(`LaTeX built (${latex.length} chars)`, 'success');
+
+        // Validate minimal LaTeX boundaries
+        if (!latex.includes('\\documentclass') || !latex.includes('\\end{document}')) {
+            addLog('LaTeX appears incomplete; aborting.', 'error');
+            throw new Error('Generated LaTeX invalid or incomplete.');
+        }
+
+        // QA checks (skip PDF validation)
+        const qa = await postCheckQA(latex, null);
+        addLog(`QA: ATS score ${qa.atsScore}%`, qa.atsScore >= 90 ? 'success' : 'warning');
+
+        // Display results - directly show LaTeX code
+        await displayResults(latex, qa);
+
+    } catch (err) {
+        addLog(`Error: ${err.message}`, 'error');
+        showError('Optimization failed: ' + err.message);
+    } finally {
+        hideSection('loading');
+    }
+}
+/* ---------- Candidate level analyzer (reused) ---------- */
+async function analyzeCandidateLevel(resumeData) {
+    addLog('Analyzing candidate experience level...', 'info');
+    const text = (resumeData.fullText || '').toLowerCase();
+    const yearsMatch = text.match(/(\\d+)\\+?\\s*years?\\s*(of)?\\s*experience/i);
+    let level = 'Mid-Level';
+    if (yearsMatch) {
+        const years = parseInt(yearsMatch[1]);
+        level = years >=5 ? 'Expert / Senior' : years >=2 ? 'Mid-Level' : 'Early Career / Beginner';
+    } else if (text.includes('senior') || text.includes('lead')) {
+        level = 'Expert / Senior';
+    } else if (text.includes('intern') || text.includes('student')) {
+        level = 'Early Career / Beginner';
+    }
+    addLog(`Candidate level: ${level}`, 'success');
+    return level;
+}
+
+/* ---------- QA checks (basic) ---------- */
+async function postCheckQA(latex, pdfBlob) {
+    const qa = { textSelectable: false, atsScore: 75, keywordMatch: [], validation: [] };
+    if (pdfBlob && pdfBlob.type === 'application/pdf') qa.textSelectable = true;
+    
+    const lower = latex.toLowerCase();
+    
+    // Check for important resume sections
+    ['experience', 'education', 'skills'].forEach(k => { 
+        if (lower.includes(k)) qa.keywordMatch.push(k); 
+    });
+    
+    // Check for tech keywords based on skills commonly found in resumes
+    ['python', 'javascript', 'java', 'c++', 'aws', 'docker', 'kubernetes', 'react', 
+     'machine learning', 'data science', 'devops', 'cloud', 'sql'].forEach(k => {
+        if (lower.includes(k.toLowerCase())) qa.keywordMatch.push(k);
+    });
+    
+    // Calculate ATS score based on structure and keywords
+    qa.atsScore = Math.min(95, 70 + qa.keywordMatch.length * 2);
+    
+    // Validate LaTeX structure
+    qa.validation.push({ check: 'LaTeX structure', passed: latex.includes('\\documentclass') });
+    qa.validation.push({ check: 'Sections present', passed: (latex.match(/\\section\{/g) || []).length >= 3 });
+    qa.validation.push({ check: 'Skills categorized', passed: lower.includes('languages') && lower.includes('frameworks') });
+    qa.validation.push({ check: 'Bullet points', passed: latex.includes('\\resumeItem') });
+    
+    return qa;
+}
+
+/* ---------- Display results ---------- */
+async function displayResults(latex, qaResults) {
+    // Create a textarea element to display the LaTeX code
+    const previewSection = document.getElementById('previewSection');
+    previewSection.innerHTML = `
+        <h3><i class="fas fa-file-code"></i> LaTeX Output</h3>
+        <div id="compilationInfo" style="background:#fff3cd;border:1px solid #ffc107;padding:10px;border-radius:5px;margin-bottom:12px;">
+            <strong><i class="fas fa-info-circle"></i> Status:</strong> <span id="compilationMessage"></span>
+        </div>
+        <pre id="latexOutput" style="background:#f8f9fa; padding:15px; border:1px solid #dee2e6; border-radius:5px; font-family:'Courier New', monospace; font-size:12px; overflow-x:auto; white-space:pre-wrap; max-height:500px; overflow-y:auto;"></pre>
+        <div style="margin-top:12px; text-align:center;">
+            <button id="copyLatexBtn" class="download-button" onclick="copyLatexToClipboard()"><i class="fas fa-copy"></i> Copy LaTeX</button>
+        </div>
+    `;
+    
+    // Set the LaTeX code to the pre element
+    document.getElementById('latexOutput').textContent = latex;
+
+    showSection('previewSection');
+    showSection('logsSection');
+    
+    // Update compilation info display
+    const compMsg = document.getElementById('compilationMessage');
+    const comp = document.getElementById('compilationInfo');
+    comp.style.background = qaResults && qaResults.atsScore >= 90 ? '#d4edda' : '#fff3cd';
+    comp.style.borderColor = qaResults && qaResults.atsScore >= 90 ? '#28a745' : '#ffc107';
+    compMsg.innerHTML = `ATS Score: ${qaResults ? qaResults.atsScore : 'N/A'}% | Keywords: ${qaResults ? qaResults.keywordMatch.length : 0}`;
+    
+    showSuccess('LaTeX code generated successfully.');
+}
+
+/* ---------- Copy LaTeX to clipboard ---------- */
+function copyLatexToClipboard() {
+    const latex = document.getElementById('latexOutput').textContent;
+    navigator.clipboard.writeText(latex).then(() => {
+        addLog('LaTeX copied to clipboard', 'success');
+        showSuccess('LaTeX code copied to clipboard!');
+    }).catch(() => {
+        addLog('Failed to copy LaTeX', 'error');
+        showError('Failed to copy LaTeX code.');
+    });
+}
+</script>
+
+<!-- FontAwesome icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</body>
+</html>

@@ -1,0 +1,108 @@
+import json
+import logging
+from pathlib import Path
+from typing import List, Optional, Tuple
+
+import numpy as np
+
+from ..core.config import settings
+from .nlp_service import NLPService
+
+logger = logging.getLogger(__name__)
+
+
+class SemanticANNService:
+    """Wrapper around a prebuilt HNSW/FAISS index (optional fallback to disabled state)."""
+
+    def __init__(self):
+        self.enabled = False
+        self.index = None
+        self.embeddings: Optional[np.ndarray] = None
+        self.normalized_embeddings: Optional[np.ndarray] = None
+        self.job_ids: List[str] = []
+        self.dimension: Optional[int] = None
+        self.nlp_service = NLPService()
+
+        self._load_index()
+
+    def _load_index(self):
+        index_path = self._resolve_path(settings.SEMANTIC_INDEX_PATH)
+        ids_path = self._resolve_path(settings.SEMANTIC_INDEX_IDS)
+
+        if not index_path or not ids_path:
+            logger.info("Semantic ANN index paths not configured; semantic source disabled.")
+            return
+
+        try:
+            ids = json.loads(Path(ids_path).read_text())
+            embeddings = np.load(index_path)
+            if embeddings.shape[0] != len(ids):
+                raise ValueError("Embedding count does not match job id count.")
+            self.dimension = embeddings.shape[1]
+            self.embeddings = embeddings
+            self.normalized_embeddings = self._normalize(embeddings)
+            self.job_ids = ids
+
+            try:
+                import hnswlib
+
+                index = hnswlib.Index(space="cosine", dim=self.dimension)
+                index.init_index(max_elements=len(ids), ef_construction=200, M=16)
+                index.add_items(embeddings, list(range(len(ids))))
+                self.index = index
+                logger.info("Semantic ANN index loaded with %s items via hnswlib.", len(ids))
+            except ModuleNotFoundError:
+                logger.warning("hnswlib not installed; falling back to brute-force semantic search.")
+
+            self.enabled = True
+        except Exception as exc:
+            logger.error("Failed to load semantic ANN index: %s", exc)
+
+    def is_available(self) -> bool:
+        return self.enabled and (self.index is not None or self.normalized_embeddings is not None)
+
+    def query(self, query_text: str, top_k: int = 100) -> List[Tuple[str, float]]:
+        if not self.is_available():
+            return []
+        try:
+            embedding_list = self.nlp_service.get_sentence_embeddings([query_text])
+            if not embedding_list:
+                return []
+            embedding = np.asarray(embedding_list[0], dtype=np.float32)
+            if self.index is not None:
+                labels, distances = self.index.knn_query(embedding, k=min(top_k, len(self.job_ids)))
+                hits = []
+                for idx, dist in zip(labels[0], distances[0]):
+                    job_id = self.job_ids[idx]
+                    score = 1 - dist  # cosine distance -> similarity
+                    hits.append((job_id, float(score)))
+                return hits
+
+            if self.normalized_embeddings is None:
+                return []
+
+            norm = np.linalg.norm(embedding)
+            if norm == 0:
+                return []
+            normalized_query = embedding / norm
+            sims = self.normalized_embeddings @ normalized_query
+            top_indices = np.argsort(-sims)[: min(top_k, len(self.job_ids))]
+            return [(self.job_ids[idx], float(sims[idx])) for idx in top_indices]
+        except Exception as exc:
+            logger.error("Semantic ANN query failed: %s", exc)
+            return []
+
+    def _normalize(self, matrix: np.ndarray) -> np.ndarray:
+        norms = np.linalg.norm(matrix, axis=1, keepdims=True)
+        norms[norms == 0] = 1.0
+        return matrix / norms
+
+    def _resolve_path(self, path_str: Optional[str]) -> Optional[Path]:
+        if not path_str:
+            return None
+        path = Path(path_str)
+        if path.is_absolute():
+            return path
+        # Resolve relative paths against repository root (two levels up from backend/app)
+        repo_root = Path(__file__).resolve().parents[3]
+        return repo_root / path

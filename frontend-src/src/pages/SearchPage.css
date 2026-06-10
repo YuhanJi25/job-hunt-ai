@@ -1,0 +1,1349 @@
+/* Recommendations Section */
+.recommendations-section {
+  padding: 60px 24px;
+  background: #f8f9fa;
+  min-height: calc(100vh - 300px);
+}
+
+.recommendations-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.recommendations-title {
+  font-size: 32px !important;
+  font-weight: 700 !important;
+  color: #1a1a1a !important;
+  margin-bottom: 40px !important;
+}
+
+/* Elaborated Queries Section - Below Search Box */
+.elaborated-queries-section {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 8px 24px 30px 24px;
+}
+
+.elaborated-queries-container {
+  width: 100%;
+}
+
+.elaborated-queries-title {
+  font-size: 24px !important;
+  font-weight: 600 !important;
+  color: #1a1a1a !important;
+  margin-bottom: 20px !important;
+  text-align: center;
+}
+
+.elaborated-queries-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 16px;
+}
+
+.elaborated-query-card {
+  background: white;
+  border: 1px solid #e8e8e8;
+  border-radius: 12px;
+  padding: 24px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.elaborated-query-card:hover {
+  border-color: #1890ff;
+  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.1);
+}
+
+.query-example-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+}
+
+.query-example-text {
+  font-size: 15px;
+  color: #1a1a1a;
+  line-height: 1.6;
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+
+.query-example-description {
+  display: block;
+  font-size: 13px;
+  color: #999;
+  line-height: 1.5;
+  font-style: italic;
+}
+
+.recommendation-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 24px;
+  margin-top: 40px;
+}
+
+.recommendation-card {
+  border-radius: 16px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+  border: none !important;
+  text-align: left !important;
+  padding: 32px !important;
+  transition: all 0.3s ease !important;
+  background: white !important;
+}
+
+.recommendation-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
+}
+
+.recommendation-card .card-title {
+  font-size: 20px !important;
+  font-weight: 700 !important;
+  color: #1a1a1a !important;
+  margin-bottom: 12px !important;
+}
+
+.recommendation-card .card-description {
+  color: #666 !important;
+  font-size: 15px !important;
+  line-height: 1.6 !important;
+  margin-bottom: 20px !important;
+}
+
+.recommendation-card .card-link {
+  padding: 0 !important;
+  height: auto !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  color: #1890ff !important;
+}
+
+.recommendation-card .card-link:hover {
+  color: #40a9ff !important;
+}
+
+/* Geometric Dot Pattern Background - Matching Landing Page */
+.search-page-initial::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: radial-gradient(circle, rgba(24, 144, 255, 0.1) 1px, transparent 1px);
+  background-size: 30px 30px;
+  background-position: 0 0, 15px 15px;
+  opacity: 0.3;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.search-page-initial > * {
+  position: relative;
+  z-index: 1;
+}
+
+.initial-search-container {
+  max-width: 800px;
+  width: 100%;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+.initial-search-title {
+  color: #1a1a1a !important;
+  font-size: 48px !important;
+  font-weight: 700 !important;
+  margin-bottom: 16px !important;
+  line-height: 1.2 !important;
+}
+
+.initial-search-subtitle {
+  color: #666 !important;
+  font-size: 18px !important;
+  margin-bottom: 32px !important;
+  line-height: 1.6 !important;
+}
+
+.initial-search-card {
+  border-radius: 24px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
+  border: none !important;
+  padding: 40px !important;
+  background: white !important;
+  position: relative;
+  z-index: 1;
+}
+
+/* Add subtle gradient overlay similar to hero section */
+.initial-search-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(24, 144, 255, 0.08) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.initial-search-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.initial-search-input {
+  font-size: 16px !important;
+  border-radius: 12px !important;
+  padding: 16px !important;
+}
+
+.initial-search-input .ant-input {
+  border-radius: 12px !important;
+}
+
+/* Main Search Page Container */
+.search-page-container {
+  min-height: calc(100vh - 64px);
+  background: #f5f7fa;
+}
+
+/* Fancy Title Section */
+.search-page-title-section {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.fancy-search-title {
+  font-size: 56px !important;
+  font-weight: 400 !important;
+  color: #1a1a1a !important;
+  margin-bottom: 16px !important;
+  line-height: 1.2 !important;
+}
+
+.fancy-search-title .hired-highlight {
+  color: #1890ff !important;
+  padding-bottom: 2px;
+  position: relative;
+}
+
+.fancy-search-title .hired-highlight::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  border-bottom: 2px dashed #1890ff;
+  transition: width 0.5s ease-in-out;
+}
+
+.fancy-search-title .hired-highlight.show-dashes::after {
+  width: 100%;
+}
+
+.fancy-search-title .hired-highlight.typing::before {
+  content: '|';
+  animation: blink 1s infinite;
+  margin-left: 2px;
+}
+
+@keyframes blink {
+  0%, 50% {
+    opacity: 1;
+  }
+  51%, 100% {
+    opacity: 0;
+  }
+}
+
+.fancy-search-subtitle {
+  font-size: 18px !important;
+  color: #666 !important;
+  font-weight: 400 !important;
+  max-width: 600px;
+  margin: 0 auto !important;
+  line-height: 1.6 !important;
+}
+
+/* Top Search Box - Embedded in Page */
+.top-search-bar {
+  background: transparent;
+  padding: 30px 0 20px 0;
+  display: flex;
+  justify-content: center;
+}
+
+.top-search-container {
+  width: 100%;
+  max-width: 1200px;
+  padding: 0 24px;
+}
+
+.top-search-card {
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  border: none !important;
+  padding: 0 !important;
+  background: transparent !important;
+}
+
+.search-bar-wrapper {
+  width: 100%;
+}
+
+.search-input-container {
+  position: relative;
+  width: 100%;
+  background: white;
+  border: 1px solid #e8e8e8;
+  border-radius: 16px;
+  padding: 16px;
+  padding-bottom: 60px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.search-input-container:hover {
+  border-color: #d9d9d9;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.search-input-container:focus-within {
+  border-color: #1890ff;
+  box-shadow: 0 0 0 3px rgba(24, 144, 255, 0.1);
+}
+
+.search-bar-textarea {
+  width: 100% !important;
+  border: none !important;
+  background: transparent !important;
+  font-size: 16px !important;
+  line-height: 1.6 !important;
+  padding: 0 !important;
+  resize: vertical !important;
+  min-height: 80px !important;
+  box-shadow: none !important;
+  transition: none !important;
+  flex: 1;
+}
+
+.search-bar-textarea .ant-input {
+  border: none !important;
+  background: transparent !important;
+  font-size: 16px !important;
+  line-height: 1.6 !important;
+  padding: 0 !important;
+  resize: vertical !important;
+  min-height: 80px !important;
+  box-shadow: none !important;
+}
+
+.search-bar-textarea .ant-input:focus,
+.search-bar-textarea .ant-input:hover {
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+.search-bar-textarea::placeholder {
+  color: #bfbfbf !important;
+}
+
+.search-actions-icons {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.search-actions-icons > * {
+  pointer-events: all;
+}
+
+.resume-icon-btn,
+.search-icon-btn {
+  width: 48px !important;
+  height: 48px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 50% !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12) !important;
+}
+
+.resume-icon-btn {
+  background: white !important;
+  border: 1px solid #e8e8e8 !important;
+  color: #666 !important;
+}
+
+.resume-icon-btn:hover {
+  background: #f0f0f0 !important;
+  border-color: #d9d9d9 !important;
+  color: #1890ff !important;
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+.resume-icon-btn.ant-btn-primary {
+  background: #1890ff !important;
+  border-color: #1890ff !important;
+  color: white !important;
+}
+
+.search-icon-btn {
+  background: #1890ff !important;
+  border: none !important;
+  color: white !important;
+}
+
+.search-icon-btn:hover {
+  background: #40a9ff !important;
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.4) !important;
+}
+
+.resume-icon-btn .anticon,
+.search-icon-btn .anticon {
+  font-size: 20px !important;
+}
+
+.salary-range-top {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0 16px;
+}
+
+.salary-label-top {
+  font-size: 14px;
+  color: #666;
+  font-weight: 500;
+}
+
+.salary-slider-top {
+  margin: 0;
+}
+
+.salary-slider-top .ant-slider-track {
+  background: #1890ff !important;
+}
+
+.salary-slider-top .ant-slider-handle {
+  border-color: #1890ff !important;
+}
+
+.salary-value-top {
+  font-size: 13px;
+  color: #666;
+  font-weight: 500;
+}
+
+/* Results Header Section - Simple */
+.results-header-simple {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 12px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.jobs-found-text {
+  color: #666;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.jobs-count-blue {
+  color: #1890ff;
+  font-weight: 700;
+}
+
+.sort-select-simple {
+  min-width: 180px;
+}
+
+.sort-select-simple .ant-select-selector {
+  background: white !important;
+  border: 1px solid #d9d9d9 !important;
+  color: #1a1a1a !important;
+}
+
+/* Dark Top Navigation Bar */
+.search-header-bar {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  padding: 20px 32px;
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.page-title {
+  color: white !important;
+  margin: 0 !important;
+  font-size: 28px !important;
+  font-weight: 700 !important;
+}
+
+.job-count {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.sort-select {
+  min-width: 180px;
+}
+
+.sort-select .ant-select-selector {
+  background: rgba(255, 255, 255, 0.15) !important;
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  color: white !important;
+  border-radius: 8px !important;
+  height: 40px !important;
+}
+
+.sort-select .ant-select-selection-item {
+  color: white !important;
+  line-height: 38px !important;
+}
+
+.sort-select:hover .ant-select-selector {
+  border-color: rgba(255, 255, 255, 0.4) !important;
+}
+
+/* Compact Filter Bar */
+.search-filter-bar {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 16px 20px;
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+}
+
+.search-input {
+  flex: 1;
+  min-width: 200px;
+  max-width: 300px;
+}
+
+.search-input .ant-input {
+  background: white !important;
+  border-radius: 8px !important;
+  height: 40px !important;
+  border: none !important;
+}
+
+.search-input .ant-input:focus {
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2) !important;
+}
+
+.salary-range {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 280px;
+  flex: 1;
+}
+
+.salary-label {
+  color: white;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.salary-slider {
+  margin: 0;
+}
+
+.salary-slider .ant-slider-track {
+  background: #1890ff !important;
+}
+
+.salary-slider .ant-slider-handle {
+  border-color: #1890ff !important;
+  width: 16px !important;
+  height: 16px !important;
+}
+
+.salary-slider .ant-slider-handle:hover {
+  border-color: #40a9ff !important;
+}
+
+.salary-slider .ant-slider-rail {
+  background: rgba(255, 255, 255, 0.2) !important;
+}
+
+.salary-slider .ant-slider-dot {
+  border-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+.salary-slider .ant-slider-dot-active {
+  border-color: #1890ff !important;
+}
+
+.salary-value {
+  color: white;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.search-filter-bar .ant-select,
+.search-filter-bar .filter-select {
+  min-width: 140px;
+}
+
+.search-filter-bar .ant-select-selector,
+.search-filter-bar .filter-select .ant-select-selector {
+  background: white !important;
+  border-radius: 8px !important;
+  height: 40px !important;
+  border: none !important;
+}
+
+.search-filter-bar .ant-select:hover .ant-select-selector,
+.search-filter-bar .filter-select:hover .ant-select-selector {
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2) !important;
+}
+
+/* Content Layout */
+.search-content-wrapper {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 16px 24px;
+}
+
+.search-content {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 24px;
+}
+
+/* Left Sidebar Filters */
+.sidebar-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.filter-card {
+  border-radius: 20px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+  border: none !important;
+  background: white !important;
+  padding: 20px !important;
+}
+
+.filter-card-title {
+  margin: 0 0 16px 0 !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  color: #1a1a1a !important;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.filter-card .ant-checkbox-wrapper {
+  display: flex;
+  align-items: center;
+  padding: 4px 0;
+}
+
+.filter-card .ant-checkbox-wrapper span {
+  font-size: 14px;
+  color: #666;
+}
+
+/* Main Content Area */
+.main-content-area {
+  min-height: 400px;
+}
+
+.stats-card {
+  border-radius: 20px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+  border: none !important;
+  background: linear-gradient(135deg, #f6ffed 0%, #e6f7ff 100%) !important;
+  margin-bottom: 16px;
+  padding: 16px !important;
+}
+
+.stat-label {
+  display: block;
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.stat-value {
+  display: block;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.stat-high {
+  color: #52c41a;
+}
+
+.stat-medium {
+  color: #1890ff;
+}
+
+.stat-low {
+  color: #faad14;
+}
+
+/* Job Cards Grid - LuckyJob Style - 3 cards per row */
+.job-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+/* LuckyJob Style Job Card - Smaller Size */
+.job-card-luckyjob {
+  border-radius: 20px !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08) !important;
+  border: none !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 16px !important;
+}
+
+.job-card-luckyjob:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12) !important;
+}
+
+.job-card-header-luckyjob {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.job-date-luckyjob {
+  font-size: 12px;
+  color: #999;
+  font-weight: 500;
+}
+
+.bookmark-button-luckyjob {
+  padding: 4px !important;
+  font-size: 18px;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.bookmark-button-luckyjob:hover {
+  background: rgba(0, 0, 0, 0.05) !important;
+}
+
+.job-card-body-luckyjob {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.job-company-header-luckyjob {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.company-logo-luckyjob {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 700;
+  color: white;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.25);
+  flex-shrink: 0;
+}
+
+.company-info-luckyjob {
+  flex: 1;
+  min-width: 0;
+}
+
+.company-name-luckyjob {
+  display: block;
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+.job-title-luckyjob {
+  margin: 0 !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  color: #1a1a1a !important;
+  line-height: 1.3 !important;
+}
+
+.job-tags-luckyjob {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.job-tag-luckyjob {
+  background: rgba(255, 255, 255, 0.9) !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  border-radius: 6px !important;
+  padding: 4px 10px !important;
+  font-size: 11px !important;
+  color: #666 !important;
+  margin: 0 !important;
+  font-weight: 500;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.job-details-luckyjob {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.salary-amount-luckyjob {
+  font-size: 18px;
+  color: #52c41a;
+  font-weight: 700;
+}
+
+.job-location-luckyjob {
+  font-size: 13px;
+  color: #999;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.match-indicator-luckyjob {
+  margin-top: 12px;
+}
+
+.match-badge-luckyjob {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 10px 16px;
+  border-radius: 16px;
+  color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.match-percentage-luckyjob {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.match-label-luckyjob {
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  opacity: 0.95;
+}
+
+.match-badge-luckyjob {
+  cursor: help;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.match-badge-luckyjob:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.match-tooltip-luckyjob {
+  max-width: 400px !important;
+}
+
+.match-tooltip-luckyjob .ant-tooltip-inner {
+  padding: 16px;
+  border-radius: 8px;
+}
+
+.job-card-footer-luckyjob {
+  margin-top: 16px;
+  padding-top: 16px;
+}
+
+.details-button-luckyjob {
+  height: 44px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 15px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  transition: all 0.3s ease;
+}
+
+.details-button-luckyjob:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+}
+
+/* Loading Container */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+  padding: 48px;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .search-content {
+    grid-template-columns: 260px 1fr;
+  }
+
+  .job-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 968px) {
+  .search-content {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar-filters {
+    order: 2;
+  }
+
+  .main-content-area {
+    order: 1;
+  }
+
+  .job-cards-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .search-filter-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-input {
+    max-width: 100%;
+  }
+
+  .salary-range {
+    min-width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .search-header-bar {
+    padding: 16px 20px;
+  }
+
+  .page-title {
+    font-size: 24px !important;
+  }
+
+  .header-top {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .search-content-wrapper {
+    padding: 16px;
+  }
+
+  .results-header-simple {
+    padding: 12px 16px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .jobs-found-text {
+    font-size: 13px;
+  }
+
+  .sort-select-simple {
+    min-width: 160px;
+  }
+
+  .job-cards-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .elaborated-queries-section {
+    padding: 8px 16px 24px 16px;
+  }
+
+  .elaborated-queries-title {
+    font-size: 20px !important;
+  }
+
+  .elaborated-queries-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .top-search-bar {
+    padding: 16px 0;
+  }
+
+  .fancy-search-title {
+    font-size: 36px !important;
+  }
+
+  .fancy-search-subtitle {
+    font-size: 16px !important;
+    padding: 0 16px;
+  }
+
+  .search-bar-textarea {
+    padding-right: 0 !important;
+  }
+
+  .search-input-container {
+    padding-bottom: 70px;
+  }
+
+  .search-actions-icons {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    left: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .initial-search-title {
+    font-size: 28px !important;
+  }
+
+  .job-card-luckyjob {
+    padding: 16px !important;
+  }
+
+  .company-logo-luckyjob {
+    width: 48px;
+    height: 48px;
+    font-size: 20px;
+  }
+}
+/* Updated Job Card Styles to match the reference image */
+
+/* Job Cards Grid */
+.job-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 24px;
+  width: 100%;
+  padding: 20px 0;
+}
+
+/* Main Card */
+.job-card-luckyjob {
+  border-radius: 28px !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08) !important;
+  border: none !important;
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  overflow: visible !important;
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+  padding: 28px !important;
+  position: relative !important;
+}
+
+.job-card-luckyjob:hover {
+  transform: translateY(-8px) !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Card Header with Logo and Match Badge */
+.job-card-header-luckyjob {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: flex-start !important;
+  margin-bottom: 20px !important;
+}
+
+/* Circular Company Logo */
+.company-logo-luckyjob {
+  width: 64px !important;
+  height: 64px !important;
+  border-radius: 50% !important;
+  background: white !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 28px !important;
+  font-weight: 700 !important;
+  color: #5B6AD0 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+  flex-shrink: 0 !important;
+}
+
+/* Match Badge Positioning */
+.match-badge-container-luckyjob {
+  flex-shrink: 0 !important;
+}
+
+.match-badge-luckyjob {
+  display: inline-flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 4px !important;
+  padding: 10px 18px !important;
+  border-radius: 20px !important;
+  color: white !important;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15) !important;
+  min-width: 80px !important;
+}
+
+.match-percentage-luckyjob {
+  font-size: 22px !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+}
+
+.match-label-luckyjob {
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  text-transform: none !important;
+  letter-spacing: 0px !important;
+  opacity: 0.95 !important;
+}
+
+/* Card Body */
+.job-card-body-luckyjob {
+  flex: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+/* Job Title */
+.job-title-luckyjob {
+  margin: 0 0 8px 0 !important;
+  font-size: 24px !important;
+  font-weight: 700 !important;
+  color: #1a1a1a !important;
+  line-height: 1.3 !important;
+}
+
+/* Company Name */
+.company-name-luckyjob {
+  display: block !important;
+  font-size: 15px !important;
+  color: #888 !important;
+  margin-bottom: 20px !important;
+  font-weight: 500 !important;
+}
+
+/* Job Details Section */
+.job-details-luckyjob {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  margin-bottom: 20px !important;
+}
+
+.job-detail-item-luckyjob {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  font-size: 14px !important;
+  color: #666 !important;
+}
+
+.job-detail-icon-luckyjob {
+  font-size: 16px !important;
+  color: #999 !important;
+  width: 20px !important;
+}
+
+/* Salary */
+.salary-amount-luckyjob {
+  font-size: 16px !important;
+  color: #1a1a1a !important;
+  font-weight: 600 !important;
+}
+
+/* Location */
+.job-location-luckyjob {
+  font-size: 14px !important;
+  color: #666 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+/* Date */
+.job-date-luckyjob {
+  font-size: 14px !important;
+  color: #666 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+/* Tags Section */
+.job-tags-luckyjob {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+  margin-bottom: 20px !important;
+}
+
+.job-tag-luckyjob {
+  background: rgba(255, 255, 255, 0.9) !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  border-radius: 8px !important;
+  padding: 6px 14px !important;
+  font-size: 12px !important;
+  color: #555 !important;
+  margin: 0 !important;
+  font-weight: 500 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Remote Tag - Green */
+.job-tag-remote-luckyjob {
+  background: rgba(115, 209, 61, 0.15) !important;
+  border: 1px solid rgba(115, 209, 61, 0.3) !important;
+  color: #52c41a !important;
+  font-weight: 600 !important;
+}
+
+/* Card Footer with Button */
+.job-card-footer-luckyjob {
+  margin-top: auto !important;
+  padding-top: 16px !important;
+}
+
+.details-button-luckyjob {
+  width: 100% !important;
+  height: 50px !important;
+  border-radius: 16px !important;
+  font-weight: 600 !important;
+  font-size: 15px !important;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  border: none !important;
+  box-shadow: 0 4px 14px rgba(102, 126, 234, 0.35) !important;
+  transition: all 0.3s ease !important;
+}
+
+.details-button-luckyjob:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.45) !important;
+  background: linear-gradient(135deg, #7b8ef5 0%, #8c62b8 100%) !important;
+}
+
+/* Match Tooltip Enhancements */
+.match-badge-luckyjob {
+  cursor: help !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.match-badge-luckyjob:hover {
+  transform: scale(1.08) !important;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.25) !important;
+}
+
+.match-indicator-luckyjob {
+  margin-top: 0 !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .job-cards-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  .job-card-luckyjob {
+    padding: 20px !important;
+  }
+
+  .company-logo-luckyjob {
+    width: 56px !important;
+    height: 56px !important;
+    font-size: 24px !important;
+  }
+
+  .job-title-luckyjob {
+    font-size: 20px !important;
+  }
+
+  .match-badge-luckyjob {
+    padding: 8px 14px !important;
+    min-width: 70px !important;
+  }
+
+  .match-percentage-luckyjob {
+    font-size: 18px !important;
+  }
+}
+

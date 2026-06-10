@@ -1,0 +1,41 @@
+FROM node:18-alpine AS builder
+
+WORKDIR /app
+
+# Accept build argument for API URL (with default)
+ARG REACT_APP_API_URL=http://localhost:8000/api/v1
+ENV REACT_APP_API_URL=$REACT_APP_API_URL
+
+# Set build environment variables
+ENV CI=false
+ENV GENERATE_SOURCEMAP=false
+ENV NODE_OPTIONS="--max-old-space-size=4096"
+
+# Copy package files
+COPY package.json package-lock.json* ./
+
+# Install dependencies with force to override nested deps
+RUN rm -rf node_modules package-lock.json && \
+    npm cache clean --force && \
+    npm install --force
+
+# Copy source code
+COPY . .
+
+# Build the application
+RUN npm run build
+
+# Production stage
+FROM nginx:alpine
+
+RUN mkdir -p /etc/nginx/templates
+
+COPY --from=builder /app/build /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/templates/nginx.conf.template
+COPY docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh
+
+ENV PORT=8080
+EXPOSE 8080
+
+ENTRYPOINT ["/docker-entrypoint.sh"]

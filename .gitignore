@@ -4,6 +4,13 @@
 # Uploads directory
 uploads/
 
+# Local development dependencies and caches
+node_modules/
+frontend-src/node_modules/
+backend-src/.venv/
+backend-src/**/__pycache__/
+backend-src/**/*.pyc
+
 # Logs
 *.log
 
