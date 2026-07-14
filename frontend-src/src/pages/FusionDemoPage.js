@@ -75,7 +75,7 @@ export default function FusionDemoPage() {
     try {
       const activeWeights = useServerWeights ? serverWeights || DEFAULT_WEIGHTS : weights;
 
-      const data = await getMockRankedResults(queryId, numJobs, seed);
+      const data = await getMockRankedResults(queryId, numJobs, seed, activeWeights);
       setResults(data);
 
       if (data.results.length > 0) {

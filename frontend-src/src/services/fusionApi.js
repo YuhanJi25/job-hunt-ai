@@ -16,7 +16,7 @@ const api = axios.create({
 /**
  * 获取 Mock 融合排序结果（不依赖后端）
  */
-export async function getMockRankedResults(queryId, numJobs = 20, seed = null) {
+export async function getMockRankedResults(queryId, numJobs = 20, seed = null, weights = null) {
   // 如果后端可达且不是强制 mock 模式，优先调真实接口
   if (!USE_MOCK) {
     try {
@@ -24,14 +24,15 @@ export async function getMockRankedResults(queryId, numJobs = 20, seed = null) {
         query_id: queryId || 'mock_resume_001',
         num_jobs: numJobs,
         seed: seed,
+        weights: weights,
       });
       return response.data;
     } catch (err) {
       console.warn('Backend /fusion/mock-rank unreachable, using local mock:', err.message);
     }
   }
-  // 降级到纯前端 mock
-  return generateMockFusionResults(queryId, numJobs, seed || Date.now());
+  // 降级到纯前端 mock（传入 weights 以影响本地计算）
+  return generateMockFusionResults(queryId, numJobs, seed || Date.now(), weights);
 }
 
 /**

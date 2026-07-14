@@ -231,10 +231,10 @@ export default function FusionScoreCard({ result, rank, showRank = true }) {
           ))}
 
           {/* ── 缺失技能 ── */}
-          {result._missing_skills && result._missing_skills.length > 0 && (
+          {result.missing_skills && result.missing_skills.length > 0 && (
             <div style={{ marginTop: 12 }}>
               <Text strong style={{ fontSize: 13 }}>🔍 缺失技能：</Text>
-              {result._missing_skills.map((skill) => (
+              {result.missing_skills.map((skill) => (
                 <Tag key={skill} color="error" style={{ marginLeft: 4, marginTop: 4 }}>
                   {skill}
                 </Tag>

@@ -46,7 +46,7 @@ function seededRandom(seed) {
 /**
  * 生成 Mock 融合结果，模拟后端 /mock-rank 的返回
  */
-export function generateMockFusionResults(queryId = 'mock_resume_001', numJobs = 20, seed = 42) {
+export function generateMockFusionResults(queryId = 'mock_resume_001', numJobs = 20, seed = 42, customWeights = null) {
   const rand = seededRandom(seed);
   const DEFAULT_WEIGHTS = {
     bm25: 0.15,
@@ -55,6 +55,7 @@ export function generateMockFusionResults(queryId = 'mock_resume_001', numJobs =
     job_family: 0.15,
     graph: 0.15,
   };
+  const activeWeights = customWeights || DEFAULT_WEIGHTS;
 
   const jobs = [];
   for (let i = 0; i < numJobs; i++) {
@@ -102,13 +103,13 @@ export function generateMockFusionResults(queryId = 'mock_resume_001', numJobs =
       }
     }
 
-    // 融合计算
+    // 融合计算（使用传入的自定义权重）
     const finalScore = (
-      bm25 * DEFAULT_WEIGHTS.bm25 +
-      semantic * DEFAULT_WEIGHTS.semantic +
-      skillCoverage * DEFAULT_WEIGHTS.skill_coverage +
-      jobFamily * DEFAULT_WEIGHTS.job_family +
-      graph * DEFAULT_WEIGHTS.graph
+      bm25 * activeWeights.bm25 +
+      semantic * activeWeights.semantic +
+      skillCoverage * activeWeights.skill_coverage +
+      jobFamily * activeWeights.job_family +
+      graph * activeWeights.graph
     );
 
     jobs.push({
@@ -128,7 +129,7 @@ export function generateMockFusionResults(queryId = 'mock_resume_001', numJobs =
         title: MOCK_TITLES[i % MOCK_TITLES.length],
         company: MOCK_COMPANIES[Math.floor(rand() * MOCK_COMPANIES.length)],
       },
-      _missing_skills: missing,
+      missing_skills: missing,
     });
   }
 
@@ -136,13 +137,13 @@ export function generateMockFusionResults(queryId = 'mock_resume_001', numJobs =
   jobs.sort((a, b) => b.final_score - a.final_score);
   jobs.forEach((job, i) => {
     job.rank = i + 1;
-    job.explanation = generateExplanation(job, job._missing_skills);
+    job.explanation = generateExplanation(job, job.missing_skills);
   });
 
   return {
     query_id: queryId,
     results: jobs,
-    weights_used: DEFAULT_WEIGHTS,
+    weights_used: activeWeights,
   };
 }
 
