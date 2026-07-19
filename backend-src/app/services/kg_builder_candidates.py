@@ -106,4 +106,4 @@ def import_candidates(file_path):
 
 
 if __name__ == "__main__":
-    import_candidates("artifacts/dataset_iteration_04/candidate_profiles.jsonl")
+    import_candidates("artifacts/dataset_iteration_05/candidate_profiles.jsonl")

@@ -159,7 +159,7 @@ def build_sample_graph(file_path=None):
     
     if file_path is None:
         # 尝试默认路径
-        default_path = Path("artifacts/dataset_iteration_04/jobs.jsonl")
+        default_path = Path("artifacts/dataset_iteration_05/jobs.jsonl")
         if default_path.exists():
             file_path = str(default_path)
         else:

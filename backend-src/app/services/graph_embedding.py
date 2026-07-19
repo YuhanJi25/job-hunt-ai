@@ -8,7 +8,6 @@ from typing import List, Tuple
 import numpy as np
 import networkx as nx
 from sklearn.metrics.pairwise import cosine_similarity
-from node2vec import Node2Vec
 from app.services.knowledge_graph_service import KnowledgeGraphService
 
 logger = logging.getLogger(__name__)
@@ -52,6 +51,12 @@ def train_node2vec_model(edges: List[Tuple[str, str]], dimensions: int = 128, wa
     """训练Node2Vec模型"""
     if not edges:
         logger.error("边列表为空，无法训练")
+        return None
+
+    try:
+        from node2vec import Node2Vec
+    except ImportError:
+        logger.error("node2vec is not installed. Install it before training graph embeddings.")
         return None
 
     logger.info(f"开始训练Node2Vec模型，边数: {len(edges)}")

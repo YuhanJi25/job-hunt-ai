@@ -11,6 +11,7 @@ backend-src/.venv/
 backend-src/**/__pycache__/
 backend-src/**/*.pyc
 scripts/__pycache__/
+*.whl
 
 # Generated workflow artifacts
 artifacts/
