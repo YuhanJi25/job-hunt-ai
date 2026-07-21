@@ -42,7 +42,7 @@ def find_latest_dataset_iteration_dir(base_dir: Path) -> Optional[Path]:
     if not artifacts_dir.exists():
         return None
 
-    preferred = artifacts_dir / "dataset_iteration_04"
+    preferred = artifacts_dir / "dataset_iteration_05"
     if preferred.exists() and preferred.is_dir():
         return preferred
 
@@ -224,6 +224,14 @@ def write_json(path: Path, payload: Any) -> None:
     path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
+def write_jsonl(path: Path, records: Iterable[Dict[str, Any]]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", encoding="utf-8", newline="\n") as handle:
+        for record in records:
+            handle.write(json.dumps(record, ensure_ascii=False, separators=(",", ":")))
+            handle.write("\n")
+
+
 def main(
     sample_limit: int | None = None,
     use_fallback: bool = False,
@@ -302,8 +310,10 @@ def main(
         )
 
     write_json(artifact_dir / "semantic_rerank_output.json", rerank_results)
+    write_jsonl(artifact_dir / "semantic_rerank_output.jsonl", rerank_results)
     sample_n = profiles_sample_n if (profiles_sample_n and profiles_sample_n > 0) else min(3, len(rerank_results))
     write_json(artifact_dir / "semantic_rerank_output.sample.json", rerank_results[:sample_n])
+    write_jsonl(artifact_dir / "semantic_rerank_output.sample.jsonl", rerank_results[:sample_n])
 
     comparison_pairs = build_comparison_pairs(jobs, profiles)
     comparison_service = NLPService(sentence_transformer_model=comparison_model)
@@ -329,6 +339,7 @@ def main(
     print(f"Wrote embeddings to {artifact_dir / 'jobs_embeddings.npy'}")
     print(f"Wrote ids to {artifact_dir / 'jobs_embedding_ids.json'}")
     print(f"Wrote rerank output to {artifact_dir / 'semantic_rerank_output.json'}")
+    print(f"Wrote rerank JSONL to {artifact_dir / 'semantic_rerank_output.jsonl'}")
     print(f"Wrote model comparison to {artifact_dir / 'embedding_model_comparison.json'}")
     print(f"Wrote model metadata to {metadata_path}")
 
