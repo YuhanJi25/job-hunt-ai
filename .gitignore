@@ -16,6 +16,12 @@ scripts/__pycache__/
 # Generated workflow artifacts
 artifacts/
 
+# Local dataset files
+dataset/incoming/*.csv
+dataset/incoming/*.jsonl
+dataset/incoming/*.md
+!dataset/incoming/README.md
+
 # Logs
 *.log
 
